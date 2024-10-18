@@ -1,0 +1,63 @@
+<% layout('layout/boilerPlate') %> %>
+
+    <header>
+        <style>
+            .alert {
+                border-radius: 8px;
+                padding: 20px;
+                font-family: Arial, sans-serif;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                overflow-wrap: break-word; /* Break long words */
+                word-wrap: break-word; /* For older browsers */
+                word-break: break-word; /* Break words if necessary */
+            }
+        
+            .alert-heading {
+                font-size: 1.5rem;
+                color: #b71c1c;
+            }
+        
+            .alert p {
+                font-size: 1rem;
+                color: #555;
+            }
+        
+            .alert hr {
+                border-top: 1px solid #e57373;
+                margin: 10px 0;
+            }
+        
+            .alert .mb-0 {
+                margin-bottom: 0;
+            }
+        
+            @media (max-width: 576px) {
+                .alert {
+                    padding: 15px; /* Adjust padding for smaller screens */
+                }
+        
+                .alert-heading {
+                    font-size: 1.25rem; /* Smaller font size */
+                }
+        
+                .alert p {
+                    font-size: 0.9rem; /* Smaller font size */
+                }
+            }
+        </style>
+        
+    </header>
+
+
+    <div class="row">
+        <div class="col-6 offset-3">
+            <div class="alert alert-danger mt-5" role="alert">
+                <h4 class="alert-heading">
+                    <%= err.message %>
+                </h4>
+                 <% if (process.env.NODE_ENV !== "production") { %>
+                    <p><%= err.stack %></p>
+                    <% } %>
+            </div>
+        </div>
+    </div>

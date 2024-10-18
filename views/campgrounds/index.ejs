@@ -1,0 +1,84 @@
+<% layout('layout/boilerPlate') %>
+
+<head>
+    <style>
+        * {
+            text-align: center;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        p {
+            color: red;
+        }
+
+        a:hover {
+            color: #0056b3;
+        }
+
+        .image-container {
+            position: relative;
+            height: 200px; /* Fixed height for image container */
+            overflow: hidden; /* Hide overflow to maintain card height */
+        }
+
+        img {
+            display: block; /* Show images normally */
+            max-width: 100%;
+            height: 100%; /* Make image height 100% of the container */
+            object-fit: cover; /* Maintain aspect ratio and cover the container */
+        }
+
+        .card {
+            height: 100%; /* Ensure card takes full height of its container */
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Campgrounds</h1>
+    <div style="display: flex; justify-content: center;">
+        <div id="map" style="width: 100%; height: 500px; margin: 1em; padding: 1em; border-radius: 10px;"></div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <% campgrounds.forEach(campground => { %>
+                <div class="col-md-4">
+                    <div class="card mb-4 shadow-sm">
+                        <div class="image-container">
+                            <% if (campground.images.length) { %>
+                                <a href="/campgrounds/<%= campground._id %>">
+                                    <img src="<%= campground.images[0].url %>" class="card-img-top"
+                                        alt="<%= campground.title %>">
+                                </a>
+                            <% } else { %>
+                                <a href="/campgrounds/<%= campground._id %>">
+                                    <img src="https://res.cloudinary.com/djxqhqu5l/image/upload/v1729014395/CampConnect/yvlhvjnfwaryfblxavhd.jpg"
+                                        class="card-img-top" alt="<%= campground.title %>">
+                                </a>
+                            <% } %>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <%= campground.title %>
+                            </h5>
+                            <p class="card-text mb-2"><%= campground.description %></p> <!-- Updated to show the description -->
+                            <a href="/campgrounds/<%= campground._id %>" class="btn btn-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+
+    <script>
+        const maptilerApiKey = '<%- process.env.MAPTILER_API_KEY %>';
+        const campgrounds = { features: <%- JSON.stringify(campgrounds) %> }
+    </script>
+
+    <script src="/javascripts/clusterMap.js"></script>
+</body>
