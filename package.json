@@ -1,4 +1,7 @@
 {
+  "engines": {
+    "node": "20.15.1"
+  },
   "dependencies": {
     "@maptiler/client": "^1.8.1",
     "cloudinary": "^2.5.1",
