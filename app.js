@@ -16,6 +16,7 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const mongoSanitize = require('express-mongo-sanitize');
 const helmet = require('helmet');
+const MongoStore = require('connect-mongo');
 const ExpressError = require('./utils/ExpressError');
 const catchAsync = require('./utils/catchAsync');
 
@@ -35,12 +36,10 @@ const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/yelp-camp';
 mongoose.connect(dbUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-});
-
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', () => {
+}).then(() => {
     console.log('Database connected');
+}).catch((err) => {
+    console.error('Database connection error:', err);
 });
 
 // Express Configuration
@@ -56,18 +55,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(mongoSanitize());
 
 // Security: Content Security Policy
-app.use((req, res, next) => {
-    res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' https://*;");
-    next();
-});
-
 const scriptSrcUrls = [
     "https://stackpath.bootstrapcdn.com/",
     "https://kit.fontawesome.com/",
     "https://cdnjs.cloudflare.com/",
     "https://cdn.jsdelivr.net",
     "https://cdn.maptiler.com/",
-    "https://code.jquery.com"
+    "https://code.jquery.com",
 ];
 
 const styleSrcUrls = [
@@ -76,7 +70,7 @@ const styleSrcUrls = [
     "https://fonts.googleapis.com/",
     "https://use.fontawesome.com/",
     "https://cdn.jsdelivr.net",
-    "https://cdn.maptiler.com/"
+    "https://cdn.maptiler.com/",
 ];
 
 const connectSrcUrls = [
@@ -101,18 +95,20 @@ app.use(
                 "data:",
                 "https://res.cloudinary.com/djxqhqu5l/", // Your Cloudinary account
                 "https://imgs.search.brave.com",
-                "https://api.maptiler.com/"
+                "https://api.maptiler.com/",
             ],
         },
     })
 );
 
 // Session Configuration
+const secret = process.env.SESSION_SECRET || 'thisshouldbeabettersecret!';
 const sessionConfig = {
     name: 'session',
-    secret: process.env.SESSION_SECRET || 'thisshouldbeabettersecret!',
+    secret,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
+    store: MongoStore.create({ mongoUrl: dbUrl }),
     cookie: {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
