@@ -145,6 +145,16 @@ app.use('/', usersRoutes);
 app.use('/campgrounds', campgroundsRoutes);
 app.use('/campgrounds/:id/reviews', reviewRoutes);
 
+// Authentication Debugging
+app.post('/login', passport.authenticate('local', {
+    failureFlash: true,
+    failureRedirect: '/login'
+}), (req, res) => {
+    const redirectUrl = req.session.returnTo || '/campgrounds';
+    delete req.session.returnTo; // Clear session returnTo after redirecting
+    res.redirect(redirectUrl);
+});
+
 // Error Handling
 app.all('*', (req, res, next) => {
     next(new ExpressError('Page Not Found', 404));
@@ -153,6 +163,7 @@ app.all('*', (req, res, next) => {
 app.use((err, req, res, next) => {
     const { statusCode = 500 } = err;
     if (!err.message) err.message = 'Oh No, Something Went Wrong!';
+    console.error(err.stack); // Log error for debugging
     res.status(statusCode).render('error', { err });
 });
 
