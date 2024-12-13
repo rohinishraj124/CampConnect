@@ -54,6 +54,13 @@ app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(mongoSanitize());
 
+// Debugging Middleware
+app.use((req, res, next) => {
+    console.log(`Request URL: ${req.url}`);
+    console.log(`Request Method: ${req.method}`);
+    next();
+});
+
 // Security: Content Security Policy
 const scriptSrcUrls = [
     "https://stackpath.bootstrapcdn.com/",
@@ -144,6 +151,11 @@ app.get('/', (req, res) => {
 app.use('/', usersRoutes);
 app.use('/campgrounds', campgroundsRoutes);
 app.use('/campgrounds/:id/reviews', reviewRoutes);
+
+// Debugging Route
+app.get('/debug', (req, res) => {
+    res.send('Debugging Route Working');
+});
 
 // Authentication Debugging
 app.post('/login', passport.authenticate('local', {
